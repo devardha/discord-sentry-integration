@@ -1,7 +1,12 @@
 import axios from "axios";
 
 export default async (req, res) => {
+	const { api_key } = req.query;
 	const { message, event, project } = req.body;
+
+	if (api_key !== process.env.API_KEY) {
+		return res.status(401).send("Invalid API key");
+	}
 
 	const browser = event.tags[0][1];
 	const os = event.tags[2][1];
@@ -30,9 +35,6 @@ export default async (req, res) => {
 		],
 	};
 
-	await axios.post(
-		"https://discord.com/api/webhooks/1005757261681020969/uOX4wYf8_Wb2_o3cyD4Ck8hXAR0kXYRfnd7OIrTCCZO0O-KsADl4zLbSTKr77xBu7c0o",
-		data
-	);
+	await axios.post(process.env.DISCORD_WEBHOOK, data);
 	return res.json({ message: "Success" });
 };
